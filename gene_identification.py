@@ -119,12 +119,30 @@ for e in range(len(exons_starts1)):
         position_starts_exon2 = exons_starts2[0]
 
 # Organizo los datos para el archivo de salida
-position_end_exon1 = position_starts_exon1 + len(exons["exon1"])
-position_end_exon2 = position_starts_exon2 + len(exons["exon2"])
-exon1_seq = seq_genome[position_starts_exon1 : position_end_exon2]
-intron1_seq = seq_genome[position_end_exon1 : position_starts_exon2]
-exon2_seq = seq_genome[position_starts_exon2 : position_end_exon2]
-gene_seq = seq_genome[position_starts_exon1 : position_end_exon2]
+genome_length = len(genome)
+if seq_genome == reversecomplem_genome:
+    forward_start_exon1 = genome_length - position_starts_exon2 - len(exons["exon2"]) + 2
+    forward_end_exon1 = genome_length - position_starts_exon2 + 1
+    exon1_seq = genome[forward_start_exon1 : forward_end_exon1]
+    forward_start_exon2 = genome_length - position_starts_exon1 - len(exons["exon1"])+ 2
+    forward_end_exon2 = genome_length - position_starts_exon1 + 1
+    exon2_seq = genome[forward_start_exon2: forward_end_exon2]
+    intron1_seq = genome[forward_end_exon1 : forward_start_exon2]
+    gene_seq = genome[forward_end_exon2 : forward_start_exon1]
+    position_starts_exon1 = forward_start_exon1
+    position_starts_exon2 = forward_start_exon2
+    position_end_exon1 = forward_end_exon1
+    position_end_exon2 = forward_end_exon2
+else:
+    # Calcular las posiciones directamente
+    position_end_exon1 = position_starts_exon1 + len(exons["exon1"]) - 1
+    position_end_exon2 = position_starts_exon2 + len(exons["exon2"]) - 1
+    exon1_seq = seq_genome[position_starts_exon1 - 1: position_end_exon1]
+    intron1_seq = seq_genome[position_end_exon1: position_starts_exon2 - 1]
+    exon2_seq = seq_genome[position_starts_exon2 - 1: position_end_exon2]
+    gene_seq = seq_genome[position_starts_exon1 - 1: position_end_exon2]
+
+# Calcular el reverso complementario del gen
 rc_gene_seq = reverse_complement(gene_seq)
 
 # Generar el documento de salida
